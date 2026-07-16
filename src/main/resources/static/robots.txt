@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /mypage
+Disallow: /checkout
+Disallow: /payments/
+Sitemap: https://jinmifood.com/sitemap.xml

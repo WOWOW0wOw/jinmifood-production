@@ -1,0 +1,12 @@
+[Unit]
+Description=Jinmi Food PostgreSQL and upload backup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/opt/jinmifood
+ExecStart=/opt/jinmifood/deploy/backup.sh
+Nice=10
+

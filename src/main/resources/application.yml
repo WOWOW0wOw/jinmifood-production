@@ -1,0 +1,98 @@
+spring:
+  jackson:
+    time-zone: Asia/Seoul
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: jinmi-shop
+  datasource:
+    url: jdbc:h2:file:./data/jinmi;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Seoul
+    hibernate:
+      ddl-auto: update
+    open-in-view: true
+  thymeleaf:
+    cache: false
+  web:
+    locale: ko_KR
+    locale-resolver: fixed
+    resources:
+      cache:
+        period: 0
+  flyway:
+    enabled: false
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/dev-schema-repair.sql
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+server:
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: ${PORT:8080}
+  max-http-request-header-size: 16KB
+  tomcat:
+    max-parameter-count: 50
+    max-http-form-post-size: 1MB
+    max-part-count: 50
+    max-swallow-size: 6MB
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  endpoints:
+    web:
+      exposure:
+        include: health
+app:
+  public-base-url: ${APP_PUBLIC_BASE_URL:http://localhost:8080}
+  payment:
+    toss:
+      mode: ${TOSS_MODE:test}
+      client-key: ${TOSS_CLIENT_KEY:}
+      secret-key: ${TOSS_SECRET_KEY:}
+      api-base-url: ${TOSS_API_BASE_URL:https://api.tosspayments.com}
+      connect-timeout: ${TOSS_CONNECT_TIMEOUT:3s}
+      read-timeout: ${TOSS_READ_TIMEOUT:10s}
+  upload:
+    dir: ${UPLOAD_DIR:./uploads}
+  sms:
+    mode: ${SMS_MODE:disabled}
+    api-key: ${SOLAPI_API_KEY:}
+    api-secret: ${SOLAPI_API_SECRET:}
+    sender: ${SOLAPI_SENDER:}
+    require-verification: ${SMS_REQUIRE_VERIFICATION:true}
+  social:
+    google:
+      client-id: ${GOOGLE_CLIENT_ID:}
+      client-secret: ${GOOGLE_CLIENT_SECRET:}
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID:}
+      client-secret: ${KAKAO_CLIENT_SECRET:}
+    naver:
+      client-id: ${NAVER_CLIENT_ID:}
+      client-secret: ${NAVER_CLIENT_SECRET:}
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:Admin!12345}
+  data-retention:
+    enabled: ${DATA_RETENTION_ENABLED:true}
+    unpaid-order-ttl: ${UNPAID_ORDER_TTL:7d}
+    batch-size: ${DATA_CLEANUP_BATCH_SIZE:100}
+    cleanup-cron: "${DATA_CLEANUP_CRON:0 17 * * * *}"
+    zone: ${DATA_CLEANUP_ZONE:Asia/Seoul}

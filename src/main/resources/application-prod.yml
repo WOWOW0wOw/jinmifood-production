@@ -1,0 +1,74 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: 2
+      connection-timeout: 30000
+      validation-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  sql:
+    init:
+      mode: never
+  thymeleaf:
+    cache: true
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+server:
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  shutdown: graceful
+  forward-headers-strategy: framework
+  compression:
+    enabled: true
+    min-response-size: 1024
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        secure: true
+app:
+  public-base-url: ${APP_PUBLIC_BASE_URL}
+  payment:
+    toss:
+      mode: ${TOSS_MODE}
+      client-key: ${TOSS_CLIENT_KEY}
+      secret-key: ${TOSS_SECRET_KEY}
+      api-base-url: ${TOSS_API_BASE_URL:https://api.tosspayments.com}
+  upload:
+    dir: ${UPLOAD_DIR:/app/uploads}
+  sms:
+    mode: ${SMS_MODE:disabled}
+    api-key: ${SOLAPI_API_KEY:}
+    api-secret: ${SOLAPI_API_SECRET:}
+    sender: ${SOLAPI_SENDER:}
+    require-verification: true
+  social:
+    google:
+      client-id: ${GOOGLE_CLIENT_ID:}
+      client-secret: ${GOOGLE_CLIENT_SECRET:}
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID:}
+      client-secret: ${KAKAO_CLIENT_SECRET:}
+    naver:
+      client-id: ${NAVER_CLIENT_ID:}
+      client-secret: ${NAVER_CLIENT_SECRET:}
+  admin:
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}
+  data-retention:
+    enabled: ${DATA_RETENTION_ENABLED:true}
+    unpaid-order-ttl: ${UNPAID_ORDER_TTL:7d}
+    batch-size: ${DATA_CLEANUP_BATCH_SIZE:100}
+    cleanup-cron: "${DATA_CLEANUP_CRON:0 17 * * * *}"
+    zone: ${DATA_CLEANUP_ZONE:Asia/Seoul}

@@ -1,0 +1,17 @@
+target/
+.idea/
+*.iml
+data/
+uploads/
+.env
+.env.production
+backups/
+secrets/
+.deploy/
+*.log
+*.local.env
+*provider-keys*.env
+*키값*.txt
+__pycache__/
+*.py[cod]
+.gitleaks-report.*

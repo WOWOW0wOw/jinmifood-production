@@ -1,0 +1,14 @@
+.catalog-detail-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 32px auto 0;
+}
+
+.detail-description:has(.catalog-detail-image) {
+    max-width: 860px;
+}
+
+.detail-description .catalog-detail-image + .info-panel {
+    margin-top: 32px;
+}

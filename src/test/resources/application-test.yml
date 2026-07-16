@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:jinmi-test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+  sql:
+    init:
+      mode: never
+app:
+  data-retention:
+    enabled: false
+  payment:
+    toss:
+      mode: test
+      client-key: test_ck_placeholder
+      secret-key: test_sk_placeholder
+      api-base-url: https://api.tosspayments.com
+      connect-timeout: 3s
+      read-timeout: 10s
+  multipart-filter:
+    enabled: false
+  sms:
+    mode: disabled
+    require-verification: false
+  social:
+    google:
+      client-id: test-google-client
+      client-secret: test-google-secret
+    kakao:
+      client-id: test-kakao-client
+      client-secret: test-kakao-secret
+    naver:
+      client-id: test-naver-client
+      client-secret: test-naver-secret

@@ -1,0 +1,11 @@
+.sms-widget{margin:16px 0;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--cream)}
+.sms-actions{display:grid;grid-template-columns:auto 1fr auto;gap:8px;margin-top:10px}
+.sms-actions input{min-width:0;margin:0!important;padding:10px;border:1px solid var(--line);border-radius:5px}
+.btn-sub{padding:8px 12px;border:1px solid var(--brown);border-radius:5px;background:#fff;color:var(--brown);font-weight:700}
+.btn-sub:disabled{opacity:.45}.sms-status{margin:8px 0 0;font-size:12px;color:var(--muted)}.sms-status.success{color:var(--green);font-weight:700}
+.social-login{display:grid;gap:8px;margin:22px 0}.social-login>span{text-align:center;color:var(--muted);font-size:12px}
+.social{display:block;padding:11px;border:1px solid var(--line);border-radius:6px;text-align:center;font-weight:700}
+.social.kakao{background:#fee500;color:#191919;border-color:#fee500}.social.naver{background:#03c75a;color:#fff;border-color:#03c75a}
+.account-recovery{display:flex;justify-content:center;gap:8px;margin:18px 0;font-size:13px}.account-recovery a{color:var(--orange)}
+.recovery-result{margin:18px 0;padding:18px;border-radius:7px;background:#edf3ee;color:var(--green)}
+@media(max-width:700px){.sms-actions{grid-template-columns:1fr}.sms-actions .btn-sub{width:100%}}

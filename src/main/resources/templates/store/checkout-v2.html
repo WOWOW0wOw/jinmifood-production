@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>주문하기 | 진미푸드</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main class="section wrap">
+    <div class="page-title"><span class="eyebrow">CHECKOUT</span><h1>주문하기</h1><p>주문 정보를 정확히 입력해 주세요.</p></div>
+    <form th:action="@{/checkout}" method="post" th:object="${checkoutForm}" class="checkout-layout">
+        <section class="form-card">
+            <div class="form-error" th:if="${#fields.hasAnyErrors()}">입력 내용을 확인해 주세요.<ul><li th:each="e : ${#fields.allErrors()}" th:text="${e}"></li></ul></div>
+            <h2>배송 정보</h2>
+            <div class="field-grid">
+                <label>받는 분<input th:field="*{customerName}" autocomplete="name" required></label>
+                <label>연락처<input th:field="*{phone}" inputmode="tel" placeholder="010-0000-0000" required></label>
+                <label class="full">이메일<input th:field="*{email}" type="email" autocomplete="email" required></label>
+                <label>우편번호<input th:field="*{postalCode}" autocomplete="postal-code" required></label>
+                <label class="full">주소<input th:field="*{address}" autocomplete="street-address" required></label>
+                <label class="full">상세주소<input th:field="*{addressDetail}" autocomplete="address-line2"></label>
+                <label class="full">배송 요청사항<textarea th:field="*{deliveryMemo}" rows="3"></textarea></label>
+                <label class="check full" th:if="${member}"><input type="checkbox" th:field="*{rememberAddress}"> 이 배송지를 내 기본 배송지로 저장</label>
+            </div>
+        </section>
+        <aside class="order-summary">
+            <h2>주문 요약</h2>
+            <div class="mini-line" th:each="line : ${cart.lines}"><span th:text="${line.product.name + ' × ' + line.quantity}"></span><b th:text="${#numbers.formatInteger(line.lineTotal, 1, 'COMMA') + '원'}"></b></div>
+            <dl>
+                <div><dt>상품금액</dt><dd th:text="${#numbers.formatInteger(cart.subtotal, 1, 'COMMA') + '원'}"></dd></div>
+                <div><dt>배송비</dt><dd th:text="${cart.shippingFee == 0 ? '무료' : #numbers.formatInteger(cart.shippingFee, 1, 'COMMA') + '원'}"></dd></div>
+                <div class="total"><dt>할인 적용 전</dt><dd th:text="${#numbers.formatInteger(cart.total, 1, 'COMMA') + '원'}"></dd></div>
+            </dl>
+            <div class="points-box" th:if="${member}">
+                <label>포인트 사용 <input th:field="*{pointsToUse}" type="number" min="0" th:max="${availablePoints.longValue() < cart.subtotal ? availablePoints.longValue() : cart.subtotal}"></label>
+                <small>보유 <b th:text="${#numbers.formatInteger(availablePoints, 1, 'COMMA') + 'P'}"></b> · 상품금액까지만 사용할 수 있습니다.</small>
+            </div>
+            <div class="points-box guest" th:unless="${member}"><a href="/login">로그인</a>하면 결제 완료 상품금액의 10%를 적립하고 보유 포인트를 사용할 수 있습니다.</div>
+            <label class="agree"><input type="checkbox" th:field="*{agreed}"> 주문 내용, <a href="/policies#terms" target="_blank">구매 조건</a> 및 <a href="/policies#privacy" target="_blank">개인정보 수집</a>에 동의합니다.</label>
+            <div class="payment-notice"><b>토스페이먼츠</b>의 안전한 결제창에서 카드·간편결제를 진행합니다.</div>
+            <button class="btn btn-block" type="submit">토스로 결제하기</button>
+        </aside>
+    </form>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

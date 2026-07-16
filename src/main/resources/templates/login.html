@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>로그인 | 진미푸드</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/member.css">
+<link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="login-page">
+<main class="login-card">
+<a class="brand" href="/">
+<span>眞味</span> 진미푸드</a>
+<h1>로그인</h1>
+<p>회원은 이메일로 로그인하면 포인트 혜택을 받을 수 있습니다.</p>
+<div class="toast static" th:if="${message}" th:text="${message}">
+</div>
+<div class="form-error" th:if="${param.error}">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+<div class="form-error" th:if="${param.disabled}">사용이 중지된 계정입니다. 관리자에게 문의해 주세요.</div>
+<div class="form-error" th:if="${param.logout}">로그아웃되었습니다.</div>
+<div class="form-error" th:if="${param.socialError}">소셜 로그인에 실패했습니다. 제공 동의와 계정 상태를 확인해 주세요.</div>
+<form th:action="@{/login}" method="post">
+<label>이메일 또는 관리자 아이디<input name="username" autocomplete="username" autofocus required>
+</label>
+<label>비밀번호<input name="password" type="password" autocomplete="current-password" required>
+</label>
+<button class="btn btn-block">로그인</button>
+</form>
+<div class="social-login" th:if="${!#lists.isEmpty(socialProviders)}"><span>또는 간편 로그인</span><a th:if="${#lists.contains(socialProviders,'google')}" href="/oauth2/authorization/google" class="social google">Google로 계속하기</a><a th:if="${#lists.contains(socialProviders,'kakao')}" href="/oauth2/authorization/kakao" class="social kakao">카카오로 계속하기</a><a th:if="${#lists.contains(socialProviders,'naver')}" href="/oauth2/authorization/naver" class="social naver">네이버로 계속하기</a></div>
+<div class="account-recovery"><a href="/account/find-email">아이디 찾기</a><span>·</span><a href="/password/forgot">비밀번호 재설정</a></div>
+<a class="account-link" href="/register">아직 회원이 아니신가요? 회원가입</a>
+<a href="/">← 쇼핑몰로 돌아가기</a>
+</main>
+</body>
+</html>

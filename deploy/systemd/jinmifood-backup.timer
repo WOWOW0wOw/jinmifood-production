@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily Jinmi Food backup at 03:30 Korea time
+
+[Timer]
+OnCalendar=*-*-* 03:30:00 Asia/Seoul
+Persistent=true
+RandomizedDelaySec=10m
+Unit=jinmifood-backup.service
+
+[Install]
+WantedBy=timers.target
+

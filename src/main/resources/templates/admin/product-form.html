@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang="ko" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>상품 편집</title><link rel="stylesheet" href="/css/style.css"></head>
+<body class="admin-body"><aside th:replace="~{admin/fragments :: side}"></aside><main class="admin-main">
+<header><div><small>CATALOG</small><h1 th:text="${product.id==null}?'새 상품 등록':'상품 수정'"></h1></div><a href="/admin/products">목록으로</a></header>
+<form th:action="@{/admin/products/save}" method="post" th:object="${product}" class="admin-card product-form">
+<input type="hidden" th:field="*{id}"><div class="form-error" th:if="${#fields.hasAnyErrors()}"><span th:each="e:${#fields.allErrors()}" th:text="${e}"></span></div>
+<div class="field-grid">
+<label class="full">상품명<input th:field="*{name}" required></label><label class="full">URL 식별자 (영문/숫자/하이픈)<input th:field="*{slug}" pattern="[a-z0-9-]+" required></label>
+<label>카테고리<select th:field="*{categoryId}" required><option th:each="c:${allCategories}" th:value="${c.id}" th:text="${c.name}"></option></select></label>
+<label>판매가<input th:field="*{price}" type="number" min="0" required></label><label>정가<input th:field="*{originalPrice}" type="number" min="0"></label><label>재고<input th:field="*{stock}" type="number" min="0" required></label>
+<label class="full">한 줄 소개<input th:field="*{summary}" maxlength="240"></label><label class="full">상세 설명<textarea th:field="*{description}" rows="7"></textarea></label>
+<label>원산지<input th:field="*{origin}" placeholder="상품 포장지 별도 표기"></label><label>제조·판매원<input th:field="*{manufacturer}" placeholder="상품 포장지 별도 표기"></label><label>중량·수량<input th:field="*{weight}" placeholder="예: 1kg, 10미"></label><label>소비기한<input th:field="*{shelfLife}" placeholder="상품 포장지 별도 표기"></label><label class="full">보관방법<input th:field="*{storageMethod}" placeholder="수령 후 냉장 또는 냉동 보관"></label>
+<label class="check"><input th:field="*{active}" type="checkbox"> 판매 노출</label><label class="check"><input th:field="*{featured}" type="checkbox"> 추천 상품</label>
+</div><button class="btn">상품정보 저장하기</button></form>
+<form th:if="${product.id != null}" th:action="@{/admin/products/{id}/image(id=${product.id})}" method="post" enctype="multipart/form-data" class="admin-card product-form">
+<h2>상품 이미지 교체</h2><p>이 작업은 상품명·가격·재고·설명을 변경하지 않습니다.</p>
+<label class="full">새 이미지 파일 (JPG·PNG·WEBP, 최대 5MB)<input name="imageFile" type="file" accept="image/jpeg,image/png,image/webp" required></label>
+<button class="btn">이미지만 교체하기</button></form></main></body></html>
