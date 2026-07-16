@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Jinmi Food Docker build cache maintenance at 04:30 Korea time
+
+[Timer]
+OnCalendar=*-*-* 04:30:00 Asia/Seoul
+Persistent=true
+RandomizedDelaySec=10m
+Unit=jinmifood-build-cache-prune.service
+
+[Install]
+WantedBy=timers.target

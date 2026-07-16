@@ -1,0 +1,13 @@
+[Unit]
+Description=Jinmi Food bounded Docker build cache cleanup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+Environment=HOME=/home/ubuntu
+ExecStart=/usr/bin/docker buildx prune --force --max-used-space 4gb --reserved-space 2gb
+Nice=15
+IOSchedulingClass=idle
+TimeoutStartSec=15m
