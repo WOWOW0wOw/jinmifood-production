@@ -66,6 +66,10 @@ services:
     networks: [backend]
     security_opt:
       - no-new-privileges:true
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777,nosuid,nodev,noexec
     logging:
       options:
         max-size: "10m"
@@ -73,7 +77,6 @@ services:
 
   cloudflared:
     image: cloudflare/cloudflared:2026.6.0
-    user: "0:0"
     restart: unless-stopped
     depends_on:
       app:
@@ -91,6 +94,10 @@ services:
     networks: [backend]
     security_opt:
       - no-new-privileges:true
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777,nosuid,nodev,noexec
     logging:
       options:
         max-size: "10m"

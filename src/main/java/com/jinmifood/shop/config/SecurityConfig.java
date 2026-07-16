@@ -23,7 +23,11 @@ public class SecurityConfig {
         };
     }
     @Bean SecurityFilterChain security(HttpSecurity http,SocialOAuth2UserService oauth2Users,SocialOidcUserService oidcUsers,SocialLoginSuccessHandler socialSuccess,ActiveMemberFilter activeMembers)throws Exception{
-        http.authorizeHttpRequests(a->a.requestMatchers("/admin/**").hasRole("ADMIN").requestMatchers("/mypage/**","/social/phone").hasRole("MEMBER").requestMatchers("/actuator/health/**").permitAll().anyRequest().permitAll())
+        http.authorizeHttpRequests(a->a.requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/mypage/**","/social/phone").hasRole("MEMBER")
+                .requestMatchers("/actuator/health","/actuator/health/**").permitAll()
+                .requestMatchers("/actuator/**").denyAll()
+                .anyRequest().permitAll())
             .csrf(c->c.ignoringRequestMatchers("/webhooks/toss"))
             .formLogin(f->f.loginPage("/login").defaultSuccessUrl("/",false).permitAll())
             .oauth2Login(o->o.loginPage("/login").successHandler(socialSuccess).failureUrl("/login?socialError")

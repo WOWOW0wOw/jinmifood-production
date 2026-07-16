@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,6 +52,11 @@ class StoreControllerTest {
 
     @Test void homeIsPublic() throws Exception {
         mvc.perform(get("/")).andExpect(status().isOk()).andExpect(content().string(containsString("진미푸드 추천상품")));
+    }
+
+    @Test void anonymousHomeViewDoesNotAllocateAServerSession() throws Exception {
+        var result=mvc.perform(get("/")).andExpect(status().isOk()).andReturn();
+        assertThat(result.getRequest().getSession(false)).isNull();
     }
 
     @Test void loginShowsConfiguredSocialProvidersAndRecoveryLinks() throws Exception {
@@ -89,6 +95,14 @@ class StoreControllerTest {
 
     @Test void adminRequiresLogin() throws Exception {
         mvc.perform(get("/admin")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrlPattern("**/login"));
+    }
+
+    @Test void actuatorDiscoveryAndSensitiveEndpointsAreDenied() throws Exception {
+        mvc.perform(get("/actuator/health")).andExpect(status().isOk());
+        mvc.perform(get("/actuator")).andExpect(status().is3xxRedirection());
+        mvc.perform(get("/actuator/env")).andExpect(status().is3xxRedirection());
+        mvc.perform(get("/actuator").with(user("member").roles("MEMBER"))).andExpect(status().isForbidden());
+        mvc.perform(get("/actuator/env").with(user("member").roles("MEMBER"))).andExpect(status().isForbidden());
     }
 
     @Test void adminProductSaveAcceptsCsrfWithoutTouchingImage() throws Exception {
@@ -138,6 +152,17 @@ class StoreControllerTest {
         mvc.perform(post("/password/reset").session(session).with(csrf()).param("password","newpass123").param("passwordConfirm","newpass123"))
             .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login"));
         assertThat(encoder.matches("newpass123",members.findById(member.getId()).orElseThrow().getPasswordHash())).isTrue();
+    }
+
+    @Test void expiredPasswordResetAuthorizationCannotBeUsed() throws Exception {
+        var session=new MockHttpSession();
+        session.setAttribute("password-reset-member",1L);
+        session.setAttribute("password-reset-expires",LocalDateTime.now().minusSeconds(1));
+
+        mvc.perform(get("/password/reset").session(session))
+                .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/password/forgot"));
+        assertThat(session.getAttribute("password-reset-member")).isNull();
+        assertThat(session.getAttribute("password-reset-expires")).isNull();
     }
 
     @Test void verifiedMemberCanFindMaskedEmail() throws Exception {

@@ -56,6 +56,17 @@ class RequestRateLimitFilterTest {
                 .isEqualTo(429);
     }
 
+    @Test
+    void ignoresSpoofedCloudflareHeaderFromAnUntrustedInternetAddress() throws Exception {
+        var filter = new RequestRateLimitFilter();
+        for (int i = 0; i < 10; i++) {
+            invoke(filter, "POST", "/login", "198.51.100.20", "203.0.113." + i);
+        }
+
+        assertThat(invoke(filter, "POST", "/login", "198.51.100.20", "203.0.113.200").getStatus())
+                .isEqualTo(429);
+    }
+
     private MockHttpServletResponse invoke(RequestRateLimitFilter filter, String method, String uri, String address)
             throws Exception {
         return invoke(filter, method, uri, address, null);

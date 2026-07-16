@@ -37,6 +37,12 @@ server:
       timeout: 30m
       cookie:
         secure: true
+        http-only: true
+        same-site: lax
+  tomcat:
+    max-http-form-post-size: 1MB
+    max-swallow-size: 6MB
+    max-part-count: 20
 app:
   public-base-url: ${APP_PUBLIC_BASE_URL}
   payment:

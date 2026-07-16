@@ -83,8 +83,18 @@ public class RequestRateLimitFilter extends OncePerRequestFilter {
 
     private String clientAddress(HttpServletRequest request) {
         String cloudflareAddress = request.getHeader("CF-Connecting-IP");
-        if (isIpAddress(cloudflareAddress)) return cloudflareAddress.trim();
+        if (isTrustedProxy(request.getRemoteAddr()) && isIpAddress(cloudflareAddress)) return cloudflareAddress.trim();
         return request.getRemoteAddr();
+    }
+
+    private boolean isTrustedProxy(String value) {
+        if (!isIpAddress(value)) return false;
+        try {
+            InetAddress address = InetAddress.getByName(value.trim());
+            return address.isLoopbackAddress() || address.isSiteLocalAddress();
+        } catch (UnknownHostException ignored) {
+            return false;
+        }
     }
 
     private boolean isIpAddress(String value) {
