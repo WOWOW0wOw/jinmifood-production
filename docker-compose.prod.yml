@@ -77,6 +77,7 @@ services:
 
   cloudflared:
     image: cloudflare/cloudflared:2026.6.0
+    user: "0:0"
     restart: unless-stopped
     depends_on:
       app:
@@ -95,6 +96,7 @@ services:
     security_opt:
       - no-new-privileges:true
     cap_drop: [ALL]
+    cap_add: [DAC_READ_SEARCH]
     read_only: true
     tmpfs:
       - /tmp:size=16m,mode=1777,nosuid,nodev,noexec
