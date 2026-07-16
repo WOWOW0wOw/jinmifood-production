@@ -14,8 +14,8 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     Optional<Member> findByEmailIgnoreCase(String email);
     boolean existsByEmailIgnoreCase(String email);
     boolean existsByPhoneAndIdNot(String phone,Long id);
-    Optional<Member> findByEmailIgnoreCaseAndPhone(String email,String phone);
-    List<Member> findByNameAndPhoneOrderByCreatedAtAsc(String name,String phone);
+    Optional<Member> findByEmailIgnoreCaseAndNameAndBirthDateAndPhone(String email,String name,java.time.LocalDate birthDate,String phone);
+    List<Member> findByNameAndBirthDateAndPhoneOrderByCreatedAtAsc(String name,java.time.LocalDate birthDate,String phone);
     @Query("select m from Member m where :query='' or lower(m.email) like lower(concat('%',:query,'%')) or lower(m.name) like lower(concat('%',:query,'%')) or m.phone like concat('%',:query,'%')")
     Page<Member> search(@Param("query") String query,Pageable pageable);
     long countByAdminTrueAndActiveTrue();

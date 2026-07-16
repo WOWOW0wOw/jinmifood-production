@@ -24,6 +24,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
+import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,7 +120,8 @@ class StoreControllerTest {
 
     @Test void memberCanRegisterLoginAndOpenMyPage() throws Exception {
         mvc.perform(post("/register").with(csrf()).param("email","member@example.com").param("name","진미회원")
-                .param("phone","010-1234-5678").param("password","test1234").param("passwordConfirm","test1234"))
+                .param("birthDate","1990-01-02").param("phone","010-1234-5678")
+                .param("password","test1234").param("passwordConfirm","test1234"))
             .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login"));
         mvc.perform(formLogin().user("member@example.com").password("test1234")).andExpect(authenticated().withRoles("MEMBER"));
         mvc.perform(get("/mypage").with(user("member@example.com").roles("MEMBER")))
@@ -127,9 +129,11 @@ class StoreControllerTest {
     }
 
     @Test void verifiedMemberCanResetPassword() throws Exception {
-        var member=members.saveAndFlush(new Member("reset@example.com",encoder.encode("oldpass123"),"재설정회원","01012345678"));
-        var session=new MockHttpSession();VerifiedPhoneProof.store(session,VerificationPurpose.RESET_PASSWORD,"01012345678");
-        mvc.perform(post("/password/forgot").session(session).with(csrf()).param("email",member.getEmail()).param("phone","010-1234-5678"))
+        var member=members.saveAndFlush(new Member("reset@example.com",encoder.encode("oldpass123"),"재설정회원",LocalDate.of(1990,1,2),"01012345678"));
+        var identity=SmsIdentity.of(member.getName(),member.getBirthDate(),member.getPhone());
+        var session=new MockHttpSession();VerifiedPhoneProof.store(session,VerificationPurpose.RESET_PASSWORD,identity);
+        mvc.perform(post("/password/forgot").session(session).with(csrf()).param("email",member.getEmail())
+                .param("name",member.getName()).param("birthDate","1990-01-02").param("phone","010-1234-5678"))
             .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/password/reset"));
         mvc.perform(post("/password/reset").session(session).with(csrf()).param("password","newpass123").param("passwordConfirm","newpass123"))
             .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/login"));
@@ -137,10 +141,20 @@ class StoreControllerTest {
     }
 
     @Test void verifiedMemberCanFindMaskedEmail() throws Exception {
-        members.saveAndFlush(new Member("findme@example.com",encoder.encode("test1234"),"아이디회원","01087654321"));
-        var session=new MockHttpSession();VerifiedPhoneProof.store(session,VerificationPurpose.FIND_EMAIL,"01087654321");
-        mvc.perform(post("/account/find-email").session(session).with(csrf()).param("name","아이디회원").param("phone","010-8765-4321"))
+        var member=members.saveAndFlush(new Member("findme@example.com",encoder.encode("test1234"),"아이디회원",LocalDate.of(1991,2,3),"01087654321"));
+        var identity=SmsIdentity.of(member.getName(),member.getBirthDate(),member.getPhone());
+        var session=new MockHttpSession();VerifiedPhoneProof.store(session,VerificationPurpose.FIND_EMAIL,identity);
+        mvc.perform(post("/account/find-email").session(session).with(csrf()).param("name",member.getName())
+                .param("birthDate","1991-02-03").param("phone","010-8765-4321"))
             .andExpect(status().isOk()).andExpect(content().string(containsString("fi***@example.com")));
+    }
+
+    @Test void adminNavigationIsVisibleOnlyToAdministrators() throws Exception {
+        mvc.perform(get("/")).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.not(containsString("href=\"/admin\""))));
+        mvc.perform(get("/").with(user("member").roles("MEMBER"))).andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.not(containsString("href=\"/admin\""))));
+        mvc.perform(get("/").with(user("admin").roles("MEMBER","ADMIN"))).andExpect(status().isOk())
+                .andExpect(content().string(containsString("href=\"/admin\"")));
     }
 
     @Test void socialProviderIdCreatesOnlyOneMemberAccount() {

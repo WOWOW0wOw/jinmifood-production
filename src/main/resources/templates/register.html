@@ -23,8 +23,9 @@
 </div>
 <label>이메일<input th:field="*{email}" type="email" autocomplete="email" required>
 </label>
-<label>이름<input th:field="*{name}" autocomplete="name" required>
+<label>이름<input th:field="*{name}" data-sms-name autocomplete="name" required>
 </label>
+<label>생년월일<input th:field="*{birthDate}" data-sms-birth type="date" autocomplete="bday" required></label>
 <div class="sms-widget" data-sms-widget data-purpose="REGISTER">
 <label>휴대전화<input th:field="*{phone}" data-sms-phone inputmode="tel" placeholder="010-0000-0000" required>
 </label>

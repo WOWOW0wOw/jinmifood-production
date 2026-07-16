@@ -2,6 +2,7 @@ package com.jinmifood.shop.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name="members", indexes=@Index(name="idx_member_email", columnList="email", unique=true))
@@ -11,6 +12,7 @@ public class Member {
     @Column(nullable=false, length=100) private String passwordHash;
     @Column(nullable=false, length=40) private String name;
     @Column(nullable=false, length=20) private String phone;
+    private LocalDate birthDate;
     @Column(nullable=false) private int points;
     @Column(nullable=false) private boolean admin;
     @Column(nullable=false) private boolean active=true;
@@ -22,7 +24,11 @@ public class Member {
 
     protected Member() {}
     public Member(String email,String passwordHash,String name,String phone){
+        this(email,passwordHash,name,null,phone);
+    }
+    public Member(String email,String passwordHash,String name,LocalDate birthDate,String phone){
         this.email=email.toLowerCase();this.passwordHash=passwordHash;this.name=name;this.phone=phone;
+        this.birthDate=birthDate;
         this.createdAt=LocalDateTime.now();
     }
     public void usePoints(int amount){if(amount<0||amount>points)throw new IllegalStateException("사용 가능한 포인트를 확인해 주세요.");points-=amount;}
@@ -41,9 +47,13 @@ public class Member {
         if(phone==null||phone.isBlank())throw new IllegalArgumentException("휴대전화번호를 입력해 주세요.");
         this.phone=phone;
     }
+    public void updateVerifiedIdentity(String name,LocalDate birthDate,String phone){
+        if(name==null||name.isBlank()||birthDate==null)throw new IllegalArgumentException("본인 확인 정보를 입력해 주세요.");
+        this.name=name;this.birthDate=birthDate;verifyPhone(phone);
+    }
     public void withdraw(String anonymizedEmail,String anonymizedPasswordHash,LocalDateTime withdrawnAt){
         if(this.withdrawnAt!=null)throw new IllegalStateException("이미 탈퇴한 회원입니다.");
-        this.email=anonymizedEmail;this.passwordHash=anonymizedPasswordHash;this.name="탈퇴 회원";this.phone="";
+        this.email=anonymizedEmail;this.passwordHash=anonymizedPasswordHash;this.name="탈퇴 회원";this.phone="";this.birthDate=null;
         this.points=0;this.admin=false;this.active=false;this.postalCode=null;this.address=null;this.addressDetail=null;
         this.withdrawnAt=withdrawnAt;
     }
@@ -57,6 +67,7 @@ public class Member {
     }
     public Long getId(){return id;} public String getEmail(){return email;} public String getPasswordHash(){return passwordHash;}
     public String getName(){return name;} public String getPhone(){return phone;} public int getPoints(){return points;}
+    public LocalDate getBirthDate(){return birthDate;}
     public boolean isAdmin(){return admin;}
     public boolean isActive(){return active;}
     public boolean isWithdrawn(){return withdrawnAt!=null;}

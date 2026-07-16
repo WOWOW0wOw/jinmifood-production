@@ -31,11 +31,11 @@ public class SocialMemberService {
         accounts.save(new SocialAccount(provider,profile.providerUserId(),member));return member;
     }
     @Transactional
-    public Member completeVerifiedPhone(String email,String phone){
+    public Member completeVerifiedIdentity(String email,String name,java.time.LocalDate birthDate,String phone){
         Member member=members.findByEmailForUpdate(email).orElseThrow(()->new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
-        if(!member.getPhone().isBlank())return member;
+        if(!member.getPhone().isBlank()&&member.getBirthDate()!=null)return member;
         if(members.existsByPhoneAndIdNot(phone,member.getId()))throw new IllegalStateException("이미 다른 회원이 사용 중인 휴대전화번호입니다.");
-        member.verifyPhone(phone);
+        member.updateVerifiedIdentity(name,birthDate,phone);
         return member;
     }
     private String syntheticEmail(String provider,String id){

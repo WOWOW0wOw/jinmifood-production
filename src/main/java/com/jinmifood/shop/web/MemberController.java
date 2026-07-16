@@ -4,7 +4,6 @@ import com.jinmifood.shop.domain.Member;
 import com.jinmifood.shop.domain.VerificationPurpose;
 import com.jinmifood.shop.config.properties.SmsProperties;
 import com.jinmifood.shop.config.properties.SocialLoginProperties;
-import com.jinmifood.shop.service.SmsVerificationService;
 import com.jinmifood.shop.service.MemberWithdrawalService;
 import jakarta.servlet.http.HttpSession;
 import com.jinmifood.shop.repository.*;
@@ -32,10 +31,12 @@ public class MemberController {
     @PostMapping("/register") String register(@Valid @ModelAttribute RegistrationForm registrationForm,BindingResult errors,RedirectAttributes redirect,HttpSession session,Model model){
         if(!registrationForm.getPassword().equals(registrationForm.getPasswordConfirm()))errors.rejectValue("passwordConfirm","mismatch","비밀번호 확인이 일치하지 않습니다.");
         if(registrationForm.getEmail()!=null&&members.existsByEmailIgnoreCase(registrationForm.getEmail()))errors.rejectValue("email","duplicate","이미 가입된 이메일입니다.");
-        String phone="";try{phone=SmsVerificationService.normalizePhone(registrationForm.getPhone());}catch(IllegalArgumentException e){errors.rejectValue("phone","invalid",e.getMessage());}
-        if(sms.isRequireVerification()&&!phone.isBlank()&&!VerifiedPhoneProof.matches(session,VerificationPurpose.REGISTER,phone))errors.rejectValue("phone","unverified","휴대전화 문자인증을 완료해 주세요.");
+        SmsIdentity identity=null;
+        try{identity=SmsIdentity.of(registrationForm.getName(),registrationForm.getBirthDate(),registrationForm.getPhone());}
+        catch(IllegalArgumentException e){errors.reject("identity",e.getMessage());}
+        if(sms.isRequireVerification()&&identity!=null&&!VerifiedPhoneProof.matches(session,VerificationPurpose.REGISTER,identity))errors.rejectValue("phone","unverified","이름·생년월일 입력 후 휴대전화 문자인증을 완료해 주세요.");
         if(errors.hasErrors()){addLoginOptions(model);return "register";}
-        members.save(new Member(registrationForm.getEmail(),encoder.encode(registrationForm.getPassword()),registrationForm.getName().trim(),phone));
+        members.save(new Member(registrationForm.getEmail(),encoder.encode(registrationForm.getPassword()),identity.name(),identity.birthDate(),identity.phone()));
         VerifiedPhoneProof.consume(session,VerificationPurpose.REGISTER);
         redirect.addFlashAttribute("message","회원가입이 완료되었습니다. 로그인해 주세요.");return "redirect:/login";
     }

@@ -22,7 +22,7 @@ public class ActiveMemberFilter extends OncePerRequestFilter {
                 SecurityContextHolder.clearContext();HttpSession session=request.getSession(false);if(session!=null)session.invalidate();
                 response.sendRedirect("/login?disabled");return;
             }
-            if(stored!=null&&authentication instanceof OAuth2AuthenticationToken&&stored.getPhone().isBlank()&&!allowedDuringPhoneVerification(request)){
+            if(stored!=null&&authentication instanceof OAuth2AuthenticationToken&&(stored.getPhone().isBlank()||stored.getBirthDate()==null)&&!allowedDuringPhoneVerification(request)){
                 response.sendRedirect(request.getContextPath()+"/social/phone");return;
             }
         }

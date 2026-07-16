@@ -3,7 +3,6 @@ package com.jinmifood.shop.web;
 import com.jinmifood.shop.config.properties.SmsProperties;
 import com.jinmifood.shop.domain.VerificationPurpose;
 import com.jinmifood.shop.repository.MemberRepository;
-import com.jinmifood.shop.service.SmsVerificationService;
 import com.jinmifood.shop.service.SocialMemberService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
@@ -29,22 +28,24 @@ public class SocialPhoneController {
     String form(Authentication authentication,Model model){
         if(!(authentication instanceof OAuth2AuthenticationToken))return "redirect:/";
         var member=members.findByEmailIgnoreCase(authentication.getName()).orElseThrow();
-        if(!member.getPhone().isBlank())return "redirect:/";
+        if(!member.getPhone().isBlank()&&member.getBirthDate()!=null)return "redirect:/";
+        model.addAttribute("memberName",member.getName());
         model.addAttribute("smsConfigured",sms.isConfigured());
         return "social-phone";
     }
 
     @PostMapping("/social/phone")
-    String complete(@RequestParam String phone,Authentication authentication,HttpSession session,Model model,RedirectAttributes redirect){
+    String complete(@RequestParam String name,@RequestParam String birthDate,@RequestParam String phone,
+        Authentication authentication,HttpSession session,Model model,RedirectAttributes redirect){
         if(!(authentication instanceof OAuth2AuthenticationToken))return "redirect:/";
         model.addAttribute("smsConfigured",sms.isConfigured());
-        String normalized;
-        try{normalized=SmsVerificationService.normalizePhone(phone);}
+        SmsIdentity identity;
+        try{identity=SmsIdentity.of(name,birthDate,phone);}
         catch(IllegalArgumentException e){model.addAttribute("error",e.getMessage());return "social-phone";}
-        if(!VerifiedPhoneProof.matches(session,VerificationPurpose.SOCIAL_LOGIN,normalized)){
-            model.addAttribute("error","문자로 휴대전화 본인 확인을 완료해 주세요.");return "social-phone";
+        if(!VerifiedPhoneProof.matches(session,VerificationPurpose.SOCIAL_LOGIN,identity)){
+            model.addAttribute("error","이름·생년월일 입력 후 문자로 휴대전화 본인 확인을 완료해 주세요.");return "social-phone";
         }
-        try{socialMembers.completeVerifiedPhone(authentication.getName(),normalized);}
+        try{socialMembers.completeVerifiedIdentity(authentication.getName(),identity.name(),identity.birthDate(),identity.phone());}
         catch(IllegalArgumentException|IllegalStateException e){model.addAttribute("error",e.getMessage());return "social-phone";}
         VerifiedPhoneProof.consume(session,VerificationPurpose.SOCIAL_LOGIN);
         redirect.addFlashAttribute("message","휴대전화 본인 확인이 완료되었습니다.");
