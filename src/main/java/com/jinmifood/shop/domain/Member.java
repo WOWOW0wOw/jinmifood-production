@@ -18,6 +18,7 @@ public class Member {
     @Column(length=200) private String address;
     @Column(length=200) private String addressDetail;
     @Column(nullable=false, updatable=false) private LocalDateTime createdAt;
+    private LocalDateTime withdrawnAt;
 
     protected Member() {}
     public Member(String email,String passwordHash,String name,String phone){
@@ -36,6 +37,16 @@ public class Member {
         points=(int)adjusted;
     }
     public void changePassword(String passwordHash){this.passwordHash=passwordHash;}
+    public void verifyPhone(String phone){
+        if(phone==null||phone.isBlank())throw new IllegalArgumentException("휴대전화번호를 입력해 주세요.");
+        this.phone=phone;
+    }
+    public void withdraw(String anonymizedEmail,String anonymizedPasswordHash,LocalDateTime withdrawnAt){
+        if(this.withdrawnAt!=null)throw new IllegalStateException("이미 탈퇴한 회원입니다.");
+        this.email=anonymizedEmail;this.passwordHash=anonymizedPasswordHash;this.name="탈퇴 회원";this.phone="";
+        this.points=0;this.admin=false;this.active=false;this.postalCode=null;this.address=null;this.addressDetail=null;
+        this.withdrawnAt=withdrawnAt;
+    }
     public void updateDefaultAddress(String postalCode,String address,String addressDetail){
         this.postalCode=clean(postalCode);this.address=clean(address);this.addressDetail=clean(addressDetail);
     }
@@ -48,6 +59,8 @@ public class Member {
     public String getName(){return name;} public String getPhone(){return phone;} public int getPoints(){return points;}
     public boolean isAdmin(){return admin;}
     public boolean isActive(){return active;}
+    public boolean isWithdrawn(){return withdrawnAt!=null;}
     public String getPostalCode(){return postalCode;} public String getAddress(){return address;} public String getAddressDetail(){return addressDetail;}
     public LocalDateTime getCreatedAt(){return createdAt;}
+    public LocalDateTime getWithdrawnAt(){return withdrawnAt;}
 }

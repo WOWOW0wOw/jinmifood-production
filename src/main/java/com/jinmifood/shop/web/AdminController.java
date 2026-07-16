@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.NoSuchElementException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @Controller
 @RequestMapping("/admin")
@@ -41,7 +42,10 @@ public class AdminController {
     }
 
     @GetMapping("/products")
-    String products(Model model){model.addAttribute("products",products.findAll());return "admin/products";}
+    String products(@RequestParam(defaultValue="0")int page,Model model){
+        model.addAttribute("products",products.findAll(PageRequest.of(safePage(page),20,Sort.by(Sort.Direction.DESC,"createdAt"))));
+        return "admin/products";
+    }
 
     @GetMapping("/products/new")
     String create(Model model){model.addAttribute("product",new ProductForm());addCategories(model);return "admin/product-form";}
@@ -90,13 +94,13 @@ public class AdminController {
 
     @GetMapping("/orders")
     String orders(@RequestParam(defaultValue="0") int page,Model model){
-        model.addAttribute("orders",orders.findAllByOrderByCreatedAtDesc(PageRequest.of(Math.max(0,page),30)));
+        model.addAttribute("orders",orders.findAllByOrderByCreatedAtDesc(PageRequest.of(safePage(page),30)));
         model.addAttribute("statuses",OrderStatus.values());
         return "admin/orders-page";
     }
 
     @PostMapping("/orders/{id}/status")
-    String status(@PathVariable Long id,@RequestParam OrderStatus status,RedirectAttributes redirect){
+    String status(@PathVariable Long id,@RequestParam OrderStatus status,@RequestParam(required=false)Integer returnPage,RedirectAttributes redirect){
         try{
             var order=orders.findById(id).orElseThrow();
             if(status==OrderStatus.CANCELLED&&order.getPaymentStatus()==PaymentStatus.PAID)
@@ -105,15 +109,18 @@ public class AdminController {
                 throw new IllegalStateException("토스 승인이 확인되지 않은 주문은 결제완료로 변경할 수 없습니다.");
             shop.changeOrderStatus(id,status);redirect.addFlashAttribute("message","주문 상태를 변경했습니다.");
         }catch(IllegalStateException|NoSuchElementException e){redirect.addFlashAttribute("message","변경 실패: "+e.getMessage());}
-        return "redirect:/admin/orders";
+        return ordersRedirect(returnPage);
     }
 
     @PostMapping("/orders/{id}/payment/cancel")
-    String cancelPayment(@PathVariable Long id,@RequestParam(defaultValue="고객 요청에 따른 주문 취소") String reason,RedirectAttributes redirect){
+    String cancelPayment(@PathVariable Long id,@RequestParam(defaultValue="고객 요청에 따른 주문 취소") String reason,
+                         @RequestParam(required=false)Integer returnPage,RedirectAttributes redirect){
         try{payments.cancel(id,reason);redirect.addFlashAttribute("message","토스 결제와 주문을 모두 취소했습니다.");}
         catch(PaymentException|IllegalStateException|NoSuchElementException e){redirect.addFlashAttribute("message","결제 취소 실패: "+e.getMessage());}
-        return "redirect:/admin/orders";
+        return ordersRedirect(returnPage);
     }
 
     private void addCategories(Model model){model.addAttribute("allCategories",categories.findAllByOrderByDisplayOrderAsc());}
+    private int safePage(int page){return Math.max(0,Math.min(page,100_000));}
+    private String ordersRedirect(Integer page){return page==null?"redirect:/admin/orders":"redirect:/admin/orders?page="+safePage(page);}
 }

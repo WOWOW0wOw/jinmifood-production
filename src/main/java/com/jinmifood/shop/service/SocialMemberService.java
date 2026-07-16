@@ -30,6 +30,14 @@ public class SocialMemberService {
         }
         accounts.save(new SocialAccount(provider,profile.providerUserId(),member));return member;
     }
+    @Transactional
+    public Member completeVerifiedPhone(String email,String phone){
+        Member member=members.findByEmailForUpdate(email).orElseThrow(()->new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+        if(!member.getPhone().isBlank())return member;
+        if(members.existsByPhoneAndIdNot(phone,member.getId()))throw new IllegalStateException("이미 다른 회원이 사용 중인 휴대전화번호입니다.");
+        member.verifyPhone(phone);
+        return member;
+    }
     private String syntheticEmail(String provider,String id){
         try{var digest=MessageDigest.getInstance("SHA-256").digest(id.getBytes(StandardCharsets.UTF_8));return provider+"-"+HexFormat.of().formatHex(digest,0,12)+"@social.jinmifood.local";}
         catch(Exception e){throw new IllegalStateException("소셜 계정 식별자를 처리할 수 없습니다.",e);}

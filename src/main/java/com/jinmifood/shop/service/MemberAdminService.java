@@ -17,6 +17,7 @@ public class MemberAdminService {
     @Transactional
     public void changeActive(Long memberId,boolean active,String actor,String reason){
         Member member=members.findByIdForUpdate(memberId).orElseThrow();
+        ensureNotWithdrawn(member);
         preventSelf(member,actor,"자기 계정의 상태는 변경할 수 없습니다.");
         if(!active&&member.isAdmin()&&members.countByAdminTrueAndActiveTrue()<=1)
             throw new IllegalStateException("마지막 활성 관리자는 차단할 수 없습니다.");
@@ -28,6 +29,7 @@ public class MemberAdminService {
     @Transactional
     public void changeAdmin(Long memberId,boolean admin,String actor,String reason){
         Member member=members.findByIdForUpdate(memberId).orElseThrow();
+        ensureNotWithdrawn(member);
         preventSelf(member,actor,"자기 계정의 관리자 권한은 변경할 수 없습니다.");
         if(!admin&&member.isAdmin()&&member.isActive()&&members.countByAdminTrueAndActiveTrue()<=1)
             throw new IllegalStateException("마지막 활성 관리자의 권한은 해제할 수 없습니다.");
@@ -41,11 +43,13 @@ public class MemberAdminService {
         if(delta==0||Math.abs((long)delta)>1_000_000)throw new IllegalArgumentException("포인트 조정값은 0이 아니고 100만 포인트 이하여야 합니다.");
         if(reason==null||reason.isBlank())throw new IllegalArgumentException("포인트 조정 사유를 입력해 주세요.");
         Member member=members.findByIdForUpdate(memberId).orElseThrow();
+        ensureNotWithdrawn(member);
         int before=member.getPoints();member.adjustPoints(delta);
         audit(member,actor,"POINTS",String.valueOf(before),String.valueOf(member.getPoints()),reason);
     }
 
     private void preventSelf(Member member,String actor,String message){if(member.getEmail().equalsIgnoreCase(actor))throw new IllegalStateException(message);}
+    private void ensureNotWithdrawn(Member member){if(member.isWithdrawn())throw new IllegalStateException("탈퇴한 회원 정보는 변경할 수 없습니다.");}
     private void audit(Member member,String actor,String action,String before,String after,String reason){
         String safeActor=trim(actor,120);String safeReason=trim(reason,200);
         actions.save(new MemberAdminAction(member,safeActor,action,before,after,safeReason));

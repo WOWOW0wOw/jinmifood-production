@@ -3,6 +3,7 @@ package com.jinmifood.shop.web;
 import com.jinmifood.shop.domain.PaymentStatus;
 import com.jinmifood.shop.repository.*;
 import com.jinmifood.shop.service.MemberAdminService;
+import com.jinmifood.shop.service.MemberWithdrawalService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
@@ -18,13 +19,14 @@ import java.util.stream.Collectors;
 public class AdminMemberController {
     private final MemberRepository members;private final SocialAccountRepository socialAccounts;
     private final CustomerOrderRepository orders;private final MemberAdminActionRepository actions;private final MemberAdminService memberAdmin;
+    private final MemberWithdrawalService withdrawals;
     public AdminMemberController(MemberRepository members,SocialAccountRepository socialAccounts,CustomerOrderRepository orders,
-                                 MemberAdminActionRepository actions,MemberAdminService memberAdmin){
-        this.members=members;this.socialAccounts=socialAccounts;this.orders=orders;this.actions=actions;this.memberAdmin=memberAdmin;
+                                 MemberAdminActionRepository actions,MemberAdminService memberAdmin,MemberWithdrawalService withdrawals){
+        this.members=members;this.socialAccounts=socialAccounts;this.orders=orders;this.actions=actions;this.memberAdmin=memberAdmin;this.withdrawals=withdrawals;
     }
     @GetMapping
     String list(@RequestParam(defaultValue="") String q,@RequestParam(defaultValue="0") int page,Model model){
-        String query=q.trim();int safePage=Math.max(0,page);
+        String query=q.trim();int safePage=Math.max(0,Math.min(page,100_000));
         var result=members.search(query,PageRequest.of(safePage,30,Sort.by(Sort.Direction.DESC,"createdAt")));
         var memberIds=result.getContent().stream().map(com.jinmifood.shop.domain.Member::getId).toList();
         Map<Long,List<String>> providers=memberIds.isEmpty()?Map.of():socialAccounts.findByMemberIds(memberIds).stream()
@@ -50,6 +52,10 @@ public class AdminMemberController {
     @PostMapping("/{id}/points")
     String points(@PathVariable Long id,@RequestParam int delta,@RequestParam String reason,Authentication auth,RedirectAttributes redirect){
         return perform(id,redirect,()->memberAdmin.adjustPoints(id,delta,auth.getName(),reason),"포인트를 조정했습니다.");
+    }
+    @PostMapping("/{id}/withdraw")
+    String withdraw(@PathVariable Long id,@RequestParam String reason,Authentication auth,RedirectAttributes redirect){
+        return perform(id,redirect,()->withdrawals.withdrawByAdmin(id,auth.getName(),reason),"회원 탈퇴 처리가 완료되었습니다.");
     }
     private String perform(Long id,RedirectAttributes redirect,Runnable action,String success){
         try{action.run();redirect.addFlashAttribute("message",success);}catch(IllegalArgumentException|IllegalStateException|java.util.NoSuchElementException e){redirect.addFlashAttribute("message","변경 실패: "+e.getMessage());}

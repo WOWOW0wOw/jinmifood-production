@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service @Transactional(readOnly=true)
 public class ShopService {
@@ -14,7 +16,11 @@ public class ShopService {
     public ShopService(ProductRepository p,CategoryRepository c,CustomerOrderRepository o,MemberRepository m){products=p;categories=c;orders=o;members=m;}
     public List<Category> categories(){return categories.findAllByOrderByDisplayOrderAsc();}
     public List<Product> featured(){return products.findTop8ByActiveTrueAndFeaturedTrueOrderByCreatedAtDesc();}
-    public List<Product> products(String category,String query){if(query!=null&&!query.isBlank())return products.findByActiveTrueAndNameContainingIgnoreCaseOrderByCreatedAtDesc(query.trim());if(category!=null&&!category.isBlank())return products.findByActiveTrueAndCategorySlugOrderByCreatedAtDesc(category);return products.findByActiveTrueOrderByCreatedAtDesc();}
+    public Page<Product> products(String category,String query,Pageable pageable){
+        if(query!=null&&!query.isBlank())return products.findByActiveTrueAndNameContainingIgnoreCase(query.trim(),pageable);
+        if(category!=null&&!category.isBlank())return products.findByActiveTrueAndCategorySlug(category,pageable);
+        return products.findByActiveTrue(pageable);
+    }
     public Product product(String slug){return products.findBySlugAndActiveTrue(slug).orElseThrow(()->new NoSuchElementException("상품을 찾을 수 없습니다."));}
     public CartView cartView(Cart cart){
         var lines=new ArrayList<CartView.Line>(); long subtotal=0;

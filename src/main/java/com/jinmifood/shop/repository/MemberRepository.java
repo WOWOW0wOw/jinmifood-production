@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 public interface MemberRepository extends JpaRepository<Member,Long> {
     Optional<Member> findByEmailIgnoreCase(String email);
     boolean existsByEmailIgnoreCase(String email);
+    boolean existsByPhoneAndIdNot(String phone,Long id);
     Optional<Member> findByEmailIgnoreCaseAndPhone(String email,String phone);
     List<Member> findByNameAndPhoneOrderByCreatedAtAsc(String name,String phone);
     @Query("select m from Member m where :query='' or lower(m.email) like lower(concat('%',:query,'%')) or lower(m.name) like lower(concat('%',:query,'%')) or m.phone like concat('%',:query,'%')")

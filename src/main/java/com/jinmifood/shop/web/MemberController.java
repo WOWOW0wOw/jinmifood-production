@@ -5,10 +5,13 @@ import com.jinmifood.shop.domain.VerificationPurpose;
 import com.jinmifood.shop.config.properties.SmsProperties;
 import com.jinmifood.shop.config.properties.SocialLoginProperties;
 import com.jinmifood.shop.service.SmsVerificationService;
+import com.jinmifood.shop.service.MemberWithdrawalService;
 import jakarta.servlet.http.HttpSession;
 import com.jinmifood.shop.repository.*;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,8 +23,9 @@ import org.springframework.data.domain.PageRequest;
 @Controller
 public class MemberController {
     private final MemberRepository members; private final CustomerOrderRepository orders; private final PasswordEncoder encoder;
-    private final SmsProperties sms;private final SocialLoginProperties social;
-    public MemberController(MemberRepository members,CustomerOrderRepository orders,PasswordEncoder encoder,SmsProperties sms,SocialLoginProperties social){this.members=members;this.orders=orders;this.encoder=encoder;this.sms=sms;this.social=social;}
+    private final SmsProperties sms;private final SocialLoginProperties social;private final MemberWithdrawalService withdrawals;
+    public MemberController(MemberRepository members,CustomerOrderRepository orders,PasswordEncoder encoder,SmsProperties sms,
+        SocialLoginProperties social,MemberWithdrawalService withdrawals){this.members=members;this.orders=orders;this.encoder=encoder;this.sms=sms;this.social=social;this.withdrawals=withdrawals;}
 
     @GetMapping("/login") String login(Model model){addLoginOptions(model);return "login";}
     @GetMapping("/register") String register(Model model){if(!model.containsAttribute("registrationForm"))model.addAttribute("registrationForm",new RegistrationForm());addLoginOptions(model);return "register";}
@@ -38,8 +42,19 @@ public class MemberController {
     @GetMapping("/mypage") String mypage(Authentication authentication,@RequestParam(defaultValue="0") int page,Model model){
         var member=members.findByEmailIgnoreCase(authentication.getName()).orElseThrow();
         model.addAttribute("member",member);
-        model.addAttribute("orders",orders.findMemberOrders(member.getId(),PageRequest.of(Math.max(0,page),20)));
+        model.addAttribute("orders",orders.findMemberOrders(member.getId(),PageRequest.of(Math.max(0,Math.min(page,100_000)),20)));
+        model.addAttribute("socialSession",authentication instanceof OAuth2AuthenticationToken);
         return "store/mypage-page";
+    }
+    @PostMapping("/mypage/withdraw")
+    String withdraw(@RequestParam(required=false)String currentPassword,@RequestParam String confirmation,
+        Authentication authentication,HttpSession session,RedirectAttributes redirect){
+        try{
+            withdrawals.withdrawSelf(authentication.getName(),currentPassword,confirmation,authentication instanceof OAuth2AuthenticationToken);
+            SecurityContextHolder.clearContext();session.invalidate();return "redirect:/?withdrawn";
+        }catch(IllegalArgumentException|IllegalStateException|java.util.NoSuchElementException e){
+            redirect.addFlashAttribute("withdrawalError",e.getMessage());return "redirect:/mypage#withdrawal";
+        }
     }
     private void addLoginOptions(Model model){model.addAttribute("smsConfigured",sms.isConfigured());model.addAttribute("socialProviders",social.configuredProviders());}
 }

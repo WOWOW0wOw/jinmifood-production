@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="_csrf" th:content="${_csrf.token}">
+<title>휴대전화 본인 확인 | 진미푸드</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/member.css">
+<link rel="stylesheet" href="/css/auth.css">
+<script src="/js/sms-verification.js" defer></script>
+</head>
+<body class="login-page">
+<main class="login-card register-card">
+<a class="brand" href="/"><span>眞味</span> 진미푸드</a>
+<h1>문자로 본인 확인</h1>
+<p>배송 연락처와 계정 보호를 위해 본인 휴대전화 인증이 필요합니다.</p>
+<p class="form-error" th:if="${error}" th:text="${error}"></p>
+<form th:action="@{/social/phone}" method="post">
+<div class="sms-widget" data-sms-widget data-purpose="SOCIAL_LOGIN">
+<label>휴대전화
+<input name="phone" data-sms-phone inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" required>
+</label>
+<div class="sms-actions">
+<button type="button" class="btn-sub" data-sms-send th:disabled="${!smsConfigured}">인증번호 발송</button>
+<input data-sms-code inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="인증번호 6자리">
+<button type="button" class="btn-sub" data-sms-verify th:disabled="${!smsConfigured}">인증 확인</button>
+</div>
+<p class="sms-status" data-sms-status th:text="${smsConfigured ? '문자로 휴대전화 본인 확인을 완료해 주세요.' : '문자 인증 서비스를 사용할 수 없습니다. 고객센터로 문의해 주세요.'}"></p>
+</div>
+<button class="btn btn-block" data-sms-required disabled>본인 확인 완료</button>
+</form>
+<form th:action="@{/logout}" method="post"><button class="btn-sub btn-block">로그아웃</button></form>
+</main>
+</body>
+</html>
