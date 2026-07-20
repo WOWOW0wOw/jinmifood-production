@@ -27,6 +27,10 @@ class StaticResourceHeadersTest {
         mvc.perform(get("/images/catalog/1746168229-detail.jpg")).andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", containsString("max-age=2592000")))
                 .andExpect(header().string("Cache-Control", containsString("public")));
+        mvc.perform(get("/fonts/PretendardVariable.woff2")).andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", containsString("font/woff2")))
+                .andExpect(header().string("Cache-Control", containsString("max-age=2592000")))
+                .andExpect(header().string("Cache-Control", containsString("public")));
     }
 
     @Test void storefrontResponsesDeclareKoreanLanguage() throws Exception {
