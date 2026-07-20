@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.http.HttpMethod;
 import java.time.Duration;
 
 @Configuration
@@ -24,6 +25,7 @@ public class SecurityConfig {
     }
     @Bean SecurityFilterChain security(HttpSecurity http,SocialOAuth2UserService oauth2Users,SocialOidcUserService oidcUsers,SocialLoginSuccessHandler socialSuccess,ActiveMemberFilter activeMembers)throws Exception{
         http.authorizeHttpRequests(a->a.requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST,"/products/*/reviews","/products/*/reviews/*/delete","/products/*/inquiries","/products/*/inquiries/*/delete").hasRole("MEMBER")
                 .requestMatchers("/mypage/**","/social/phone").hasRole("MEMBER")
                 .requestMatchers("/actuator/health","/actuator/health/**").permitAll()
                 .requestMatchers("/actuator/**").denyAll()

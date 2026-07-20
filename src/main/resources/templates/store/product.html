@@ -7,6 +7,7 @@
 </title>
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/product-detail.css">
+<link rel="stylesheet" href="/css/pagination.css">
 </head>
 <body>
 <header th:replace="~{fragments :: header}">
@@ -81,7 +82,7 @@
 <p class="safe-note">✓ 결제 전 주문 내용을 한 번 더 확인할 수 있습니다.</p>
 </div>
 </div>
-<section class="detail-description">
+<section id="description" class="detail-description">
 <h2>상품 상세정보</h2>
 <p th:text="${product.description}">
 </p>
@@ -96,6 +97,19 @@
 </ul>
 </div>
 </section>
+<nav class="product-tabs" aria-label="상품 상세 메뉴"><a href="#description">상세정보</a><a href="#reviews" th:text="'리뷰 '+${reviewCount}">리뷰</a><a href="#inquiries" th:text="'상품문의 '+${inquiries.totalElements}">상품문의</a></nav>
+<section id="reviews" class="community-section">
+<div class="community-heading"><div><span class="eyebrow">PURCHASE REVIEW</span><h2>구매 리뷰</h2></div><div class="rating-summary"><strong th:text="${#numbers.formatDecimal(averageRating,1,1)}">0.0</strong><span>/ 5 · <b th:text="${reviewCount}">0</b>개</span></div></div>
+<div class="write-panel" th:if="${canReview}"><h3>리뷰 작성</h3><form th:action="@{/products/{id}/reviews(id=${product.id})}" method="post"><label>별점<select name="rating" required><option value="5">★★★★★ 5점</option><option value="4">★★★★☆ 4점</option><option value="3">★★★☆☆ 3점</option><option value="2">★★☆☆☆ 2점</option><option value="1">★☆☆☆☆ 1점</option></select></label><label>후기<textarea name="content" maxlength="2000" rows="4" required placeholder="상품을 사용해 본 솔직한 후기를 남겨 주세요."></textarea></label><button class="btn">리뷰 등록</button></form></div>
+<p class="write-guide" th:if="${memberLoggedIn and !canReview}">결제가 완료된 구매 회원은 상품별로 리뷰를 한 번 작성할 수 있습니다.</p><p class="write-guide" th:unless="${memberLoggedIn}"><a th:href="@{/login}">로그인</a> 후 구매 리뷰를 작성할 수 있습니다.</p>
+<div class="entry-list"><article class="community-entry" th:each="review:${reviews.content}"><header><strong class="stars" th:text="${'★'.repeat(review.rating)+'☆'.repeat(5-review.rating)}"></strong><span th:text="${review.authorDisplayName}"></span><time th:text="${#temporals.format(review.createdAt,'yyyy.MM.dd')}"></time></header><p th:text="${review.content}"></p><form th:if="${adminLoggedIn or currentEmail == review.member.email}" th:action="@{/products/{productId}/reviews/{reviewId}/delete(productId=${product.id},reviewId=${review.id})}" method="post"><button class="link-btn" type="submit">삭제</button></form></article><div class="empty compact" th:if="${reviews.empty}">아직 등록된 리뷰가 없습니다.</div></div>
+<nav class="pagination" th:if="${reviews.totalPages>1}"><a th:if="${reviews.hasPrevious()}" th:href="@{/products/{slug}(slug=${product.slug},reviewPage=${reviews.number-1},inquiryPage=${inquiries.number})}+'#reviews'">이전</a><span th:text="${reviews.number+1}+' / '+${reviews.totalPages}"></span><a th:if="${reviews.hasNext()}" th:href="@{/products/{slug}(slug=${product.slug},reviewPage=${reviews.number+1},inquiryPage=${inquiries.number})}+'#reviews'">다음</a></nav>
+</section>
+<section id="inquiries" class="community-section"><div class="community-heading"><div><span class="eyebrow">PRODUCT Q&amp;A</span><h2>상품 문의</h2></div></div>
+<div class="write-panel" th:if="${memberLoggedIn}"><h3>상품 문의 작성</h3><form th:action="@{/products/{id}/inquiries(id=${product.id})}" method="post"><label>제목<input name="title" maxlength="120" required></label><label>문의 내용<textarea name="content" maxlength="2000" rows="4" required placeholder="상품에 대해 궁금한 점을 남겨 주세요. 개인정보는 입력하지 마세요."></textarea></label><button class="btn">문의 등록</button></form></div><p class="write-guide" th:unless="${memberLoggedIn}"><a th:href="@{/login}">로그인</a> 후 상품 문의를 작성할 수 있습니다.</p>
+<div class="entry-list"><article class="community-entry inquiry" th:each="inquiry:${inquiries.content}"><header><strong th:text="${inquiry.title}"></strong><span th:text="${inquiry.authorDisplayName}"></span><time th:text="${#temporals.format(inquiry.createdAt,'yyyy.MM.dd')}"></time><b class="status" th:text="${inquiry.answered}?'답변완료':'답변대기'"></b></header><p th:text="${inquiry.content}"></p><div class="answer" th:if="${inquiry.answered}"><strong>진미푸드 답변</strong><p th:text="${inquiry.answer}"></p><time th:text="${#temporals.format(inquiry.answeredAt,'yyyy.MM.dd')}"></time></div><form th:if="${adminLoggedIn or currentEmail == inquiry.member.email}" th:action="@{/products/{productId}/inquiries/{inquiryId}/delete(productId=${product.id},inquiryId=${inquiry.id})}" method="post"><button class="link-btn" type="submit">삭제</button></form></article><div class="empty compact" th:if="${inquiries.empty}">아직 등록된 상품 문의가 없습니다.</div></div>
+<nav class="pagination" th:if="${inquiries.totalPages>1}"><a th:if="${inquiries.hasPrevious()}" th:href="@{/products/{slug}(slug=${product.slug},reviewPage=${reviews.number},inquiryPage=${inquiries.number-1})}+'#inquiries'">이전</a><span th:text="${inquiries.number+1}+' / '+${inquiries.totalPages}"></span><a th:if="${inquiries.hasNext()}" th:href="@{/products/{slug}(slug=${product.slug},reviewPage=${reviews.number},inquiryPage=${inquiries.number+1})}+'#inquiries'">다음</a></nav>
+</section>
 </main>
 <footer th:replace="~{fragments :: footer}">
 </footer>
@@ -103,4 +117,3 @@
 </div>
 </body>
 </html>
-

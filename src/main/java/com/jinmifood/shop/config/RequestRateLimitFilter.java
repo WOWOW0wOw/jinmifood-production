@@ -25,6 +25,7 @@ public class RequestRateLimitFilter extends OncePerRequestFilter {
     private static final int LOOKUP_LIMIT = 30;
     private static final int CHECKOUT_LIMIT = 30;
     private static final int WEBHOOK_LIMIT = 120;
+    private static final int COMMUNITY_WRITE_LIMIT = 30;
     private static final int MAX_TRACKED_KEYS = 10_000;
 
     private final ConcurrentHashMap<String, Window> requests = new ConcurrentHashMap<>();
@@ -69,6 +70,7 @@ public class RequestRateLimitFilter extends OncePerRequestFilter {
 
     private int limitFor(HttpServletRequest request) {
         if (!"POST".equalsIgnoreCase(request.getMethod())) return 0;
+        if(request.getRequestURI().matches("^/products/\\d+/(reviews|inquiries)$"))return COMMUNITY_WRITE_LIMIT;
         return switch (request.getRequestURI()) {
             case "/login" -> LOGIN_LIMIT;
             case "/register" -> REGISTER_LIMIT;

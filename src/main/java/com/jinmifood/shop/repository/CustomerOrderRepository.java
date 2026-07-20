@@ -33,6 +33,8 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder,Lon
     long countByMemberId(Long memberId);
     @Query("select coalesce(sum(o.totalAmount),0) from CustomerOrder o where o.member.id=:memberId and o.paymentStatus=:paymentStatus")
     long sumPaidAmountByMemberId(@Param("memberId") Long memberId,@Param("paymentStatus") PaymentStatus paymentStatus);
+    @Query("select count(i) from CustomerOrder o join o.items i where o.member.id=:memberId and i.productId=:productId and o.paymentStatus=:paymentStatus")
+    long countPurchasedProduct(@Param("memberId")Long memberId,@Param("productId")Long productId,@Param("paymentStatus")PaymentStatus paymentStatus);
     long countByStatusIn(Collection<OrderStatus> statuses);
     @Query("select coalesce(sum(o.totalAmount),0) from CustomerOrder o where o.status in :statuses")
     long sumTotalAmountByStatusIn(Collection<OrderStatus> statuses);
