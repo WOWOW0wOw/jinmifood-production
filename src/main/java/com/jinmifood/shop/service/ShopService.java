@@ -16,6 +16,11 @@ public class ShopService {
     public ShopService(ProductRepository p,CategoryRepository c,CustomerOrderRepository o,MemberRepository m){products=p;categories=c;orders=o;members=m;}
     public List<Category> categories(){return categories.findAllByOrderByDisplayOrderAsc();}
     public List<Product> featured(){return products.findTop8ByActiveTrueAndFeaturedTrueOrderByCreatedAtDesc();}
+    public Product heroProduct(){
+        return products.findBySlugAndActiveTrue("jjagtae-assorted-size")
+            .orElseGet(()->products.findByActiveTrueAndCategorySlugOrderByCreatedAtDesc("jjagtae")
+                .stream().findFirst().orElse(null));
+    }
     public Page<Product> products(String category,String query,Pageable pageable){
         if(query!=null&&!query.isBlank())return products.findByActiveTrueAndNameContainingIgnoreCase(query.trim(),pageable);
         if(category!=null&&!category.isBlank())return products.findByActiveTrueAndCategorySlug(category,pageable);

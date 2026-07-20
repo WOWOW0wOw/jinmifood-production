@@ -12,7 +12,11 @@ import com.jinmifood.shop.service.CommunityService;
 public class StoreController {
     private final ShopService shop; private final CommunityService community;
     public StoreController(ShopService shop,CommunityService community){this.shop=shop;this.community=community;}
-    @GetMapping("/") String home(Model model){model.addAttribute("featured",shop.featured());return "store/home";}
+    @GetMapping("/") String home(Model model){
+        model.addAttribute("featured",shop.featured());
+        model.addAttribute("heroProduct",shop.heroProduct());
+        return "store/home";
+    }
     @GetMapping("/products") String products(@RequestParam(required=false)String category,@RequestParam(required=false)String q,
         @RequestParam(defaultValue="0")int page,Model model){
         var pageable=PageRequest.of(safePage(page),20,Sort.by(Sort.Direction.DESC,"createdAt"));
