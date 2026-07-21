@@ -29,7 +29,7 @@ class ConfigurationMaintenanceTest {
         assertThat(sourceIds).hasSize(22).doesNotHaveDuplicates();
         for (var sourceId : sourceIds) {
             try (var main = getClass().getResourceAsStream("/static/images/catalog/" + sourceId + "-ai-main.jpg");
-                 var detail = getClass().getResourceAsStream("/static/images/catalog/" + sourceId + "-ai-intro.jpg")) {
+                 var detail = getClass().getResourceAsStream("/static/images/catalog/" + sourceId + "-long-detail.jpg")) {
                 assertThat(main).as("main image for %s", sourceId).isNotNull();
                 assertThat(detail).as("detail image for %s", sourceId).isNotNull();
                 assertThat(main.readNBytes(2)).containsExactly((byte) 0xff, (byte) 0xd8);
