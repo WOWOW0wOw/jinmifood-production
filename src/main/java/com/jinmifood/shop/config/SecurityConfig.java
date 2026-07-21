@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .contentSecurityPolicy(c->c.policyDirectives("default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; script-src 'self' https://js.tosspayments.com; connect-src 'self' https://*.tosspayments.com; frame-src https://*.tosspayments.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'"))
                 .referrerPolicy(r->r.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                 .httpStrictTransportSecurity(hsts->hsts.includeSubDomains(true).preload(true).maxAgeInSeconds(Duration.ofDays(365).getSeconds()))
-                .permissionsPolicy(p->p.policy("camera=(), microphone=(), geolocation=(), payment=(self), usb=()")));
+                .permissionsPolicyHeader(p->p.policy("camera=(), microphone=(), geolocation=(), payment=(self), usb=()")));
         http.addFilterBefore(activeMembers,AuthorizationFilter.class);
         return http.build();
     }
