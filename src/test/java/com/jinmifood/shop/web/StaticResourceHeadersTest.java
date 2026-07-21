@@ -24,7 +24,7 @@ class StaticResourceHeadersTest {
         mvc.perform(get("/js/toss-payment.js")).andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", containsString("max-age=3600")))
                 .andExpect(header().string("Cache-Control", containsString("public")));
-        mvc.perform(get("/images/catalog/1746168229-detail.jpg")).andExpect(status().isOk())
+        mvc.perform(get("/images/catalog/1746168229-ai-detail.jpg")).andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", containsString("max-age=2592000")))
                 .andExpect(header().string("Cache-Control", containsString("public")));
         mvc.perform(get("/fonts/PretendardVariable.woff2")).andExpect(status().isOk())
