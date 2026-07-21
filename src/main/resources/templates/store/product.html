@@ -15,7 +15,7 @@
 <main class="section wrap">
 <div class="product-detail">
 <div class="detail-image">
-<img th:src="${product.imageUrl}" th:alt="${product.name}">
+<img th:src="${product.imageUrl}" th:alt="${product.name}" width="1254" height="1254" fetchpriority="high" decoding="async">
 </div>
 <div class="detail-content">
 <small th:text="${product.category.name}">
@@ -87,7 +87,7 @@
 <p th:text="${product.description}">
 </p>
 <img class="catalog-detail-image" th:if="${!#strings.isEmpty(product.detailImageUrl)}"
-     th:src="${product.detailImageUrl}" th:alt="${product.name}+' 상세 설명'" loading="lazy">
+     th:src="${product.detailImageUrl}" th:alt="${product.name}+' 상세 설명'" width="860" height="6400" loading="lazy" decoding="async">
 <div class="info-panel">
 <h3>구매 전 확인해 주세요</h3>
 <ul>
