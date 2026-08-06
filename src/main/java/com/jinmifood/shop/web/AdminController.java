@@ -24,10 +24,12 @@ public class AdminController {
     private final UploadService uploads;
     private final PaymentService payments;
     private final MemberRepository members;
+    private final SiteVisitService siteVisits;
 
     public AdminController(ProductRepository products,CategoryRepository categories,CustomerOrderRepository orders,
-                           ShopService shop,UploadService uploads,PaymentService payments,MemberRepository members){
-        this.products=products;this.categories=categories;this.orders=orders;this.shop=shop;this.uploads=uploads;this.payments=payments;this.members=members;
+                           ShopService shop,UploadService uploads,PaymentService payments,MemberRepository members,
+                           SiteVisitService siteVisits){
+        this.products=products;this.categories=categories;this.orders=orders;this.shop=shop;this.uploads=uploads;this.payments=payments;this.members=members;this.siteVisits=siteVisits;
     }
 
     @GetMapping
@@ -38,6 +40,8 @@ public class AdminController {
         model.addAttribute("memberCount",members.count());
         model.addAttribute("pendingCount",orders.countByStatusIn(java.util.List.of(OrderStatus.PAYMENT_PENDING,OrderStatus.PAID)));
         model.addAttribute("revenue",orders.sumTotalAmountByStatusIn(java.util.List.of(OrderStatus.PAID,OrderStatus.PREPARING,OrderStatus.SHIPPED,OrderStatus.DELIVERED)));
+        model.addAttribute("todayViews",siteVisits.todayViews());
+        model.addAttribute("totalViews",siteVisits.totalViews());
         return "admin/dashboard";
     }
 
