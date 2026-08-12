@@ -28,7 +28,7 @@ class ConfigurationMaintenanceTest {
 
         assertThat(sourceIds).hasSize(22).doesNotHaveDuplicates();
         for (var sourceId : sourceIds) {
-            try (var main = getClass().getResourceAsStream("/static/images/catalog/" + sourceId + "-ai-main.jpg");
+            try (var main = getClass().getResourceAsStream("/static/images/catalog/" + sourceId + "-reference-main.jpg");
                  var detail = getClass().getResourceAsStream("/static/images/catalog/" + sourceId + "-crafted-detail.jpg")) {
                 assertThat(main).as("main image for %s", sourceId).isNotNull();
                 assertThat(detail).as("detail image for %s", sourceId).isNotNull();
