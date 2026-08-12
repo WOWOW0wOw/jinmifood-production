@@ -1,1 +1,23 @@
-<!DOCTYPE html><html lang="ko" xmlns:th="http://www.thymeleaf.org"><body><aside class="admin-side" th:fragment="side"><a href="/admin" class="admin-logo">眞味 <span>관리자</span></a><nav><a href="/admin">대시보드</a><a href="/admin/products">상품 관리</a><a href="/admin/orders">주문 관리</a><a href="/admin/members">회원 관리</a><a href="/admin/inquiries">상품 문의</a><a href="/admin/notices">공지 관리</a><a href="/" target="_blank">쇼핑몰 보기 ↗</a></nav><form th:action="@{/logout}" method="post"><button>로그아웃</button></form></aside></body></html>
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside class="admin-side" th:fragment="side">
+    <link rel="stylesheet" href="/css/admin-mobile.css?v=20260812-1">
+    <a href="/admin" class="admin-logo" aria-label="관리자 대시보드"><span aria-hidden="true">眞味</span><b>관리자</b></a>
+    <div class="admin-menu-shell">
+        <nav aria-label="관리자 메뉴">
+            <a href="/admin" th:classappend="${currentPath == '/admin'} ? 'active'">대시보드</a>
+            <a href="/admin/products" th:classappend="${#strings.startsWith(currentPath,'/admin/products')} ? 'active'">상품 관리</a>
+            <a href="/admin/orders" th:classappend="${#strings.startsWith(currentPath,'/admin/orders')} ? 'active'">주문 관리</a>
+            <a href="/admin/members" th:classappend="${#strings.startsWith(currentPath,'/admin/members')} ? 'active'">회원 관리</a>
+            <a href="/admin/inquiries" th:classappend="${#strings.startsWith(currentPath,'/admin/inquiries')} ? 'active'">상품 문의</a>
+            <a href="/admin/notices" th:classappend="${#strings.startsWith(currentPath,'/admin/notices')} ? 'active'">공지 관리</a>
+            <a href="/" target="_blank" rel="noopener">쇼핑몰 보기 ↗</a>
+        </nav>
+        <span class="admin-scroll-cue" aria-hidden="true">›</span>
+    </div>
+    <form th:action="@{/logout}" method="post"><button>로그아웃</button></form>
+    <script src="/js/admin-nav.js?v=20260812-1" defer></script>
+</aside>
+</body>
+</html>

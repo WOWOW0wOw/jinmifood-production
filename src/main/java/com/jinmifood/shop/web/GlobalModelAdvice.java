@@ -17,4 +17,5 @@ public class GlobalModelAdvice {
     @ModelAttribute("memberLoggedIn") boolean memberLoggedIn(Authentication auth){return auth!=null&&auth.getAuthorities().stream().anyMatch(a->a.getAuthority().equals("ROLE_MEMBER"));}
     @ModelAttribute("loggedIn") boolean loggedIn(Authentication auth){return auth!=null&&auth.isAuthenticated();}
     @ModelAttribute("adminLoggedIn") boolean adminLoggedIn(Authentication auth){return auth!=null&&auth.isAuthenticated()&&auth.getAuthorities().stream().anyMatch(a->a.getAuthority().equals("ROLE_ADMIN"));}
+    @ModelAttribute("currentPath") String currentPath(HttpServletRequest request){return request.getRequestURI();}
 }

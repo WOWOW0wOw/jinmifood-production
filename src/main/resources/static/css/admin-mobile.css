@@ -1,0 +1,44 @@
+.admin-menu-shell{min-width:0;position:relative}
+.admin-scroll-cue{display:none}
+.admin-body .admin-side nav a.active{background:#fff;color:#29231f;font-weight:750;box-shadow:0 7px 18px rgba(0,0,0,.15)}
+.admin-body .table-wrap{overscroll-behavior-inline:contain;scrollbar-color:#b58c68 #eee8df;scrollbar-width:thin}
+.admin-body .table-wrap::-webkit-scrollbar{height:7px}
+.admin-body .table-wrap::-webkit-scrollbar-track{background:#eee8df}
+.admin-body .table-wrap::-webkit-scrollbar-thumb{border:1px solid #eee8df;border-radius:10px;background:#b58c68}
+.admin-body table{min-width:640px}
+.admin-body th,.admin-body td{word-break:keep-all}
+.admin-body td>a,.admin-body td .status,.admin-body .status-form button{display:inline-flex;min-height:36px;align-items:center;white-space:nowrap}
+.admin-body .status-form{align-items:center;flex-wrap:nowrap}
+.admin-body .admin-main>header{gap:14px}
+.admin-body .admin-main>header>span,.admin-body .admin-main>header>a{flex-shrink:0;white-space:nowrap}
+
+@media(max-width:900px){
+  .admin-body{display:block}
+  .admin-body .admin-side{position:sticky;z-index:60;top:0;display:grid;height:auto;padding:10px 12px;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:9px;border-bottom:1px solid rgba(255,255,255,.12);background:rgba(41,35,31,.97);box-shadow:0 8px 24px rgba(41,35,31,.15);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  .admin-body .admin-logo{display:flex;min-width:44px;height:44px;padding:0;align-items:center;justify-content:center;font-family:"Pretendard Variable",sans-serif;font-size:0}
+  .admin-body .admin-logo span{display:grid;width:38px;height:38px;place-items:center;border:1px solid rgba(255,255,255,.3);border-radius:50%;font-size:13px}
+  .admin-body .admin-logo b{display:none}
+  .admin-body .admin-menu-shell{overflow:hidden}
+  .admin-body .admin-side nav{display:flex;width:100%;gap:7px;padding:3px 28px 5px 2px;overflow-x:auto;scroll-padding-inline:8px;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .admin-body .admin-side nav::-webkit-scrollbar{display:none}
+  .admin-body .admin-side nav a{display:inline-flex;min-width:max-content;min-height:42px;padding:0 15px;align-items:center;border:1px solid rgba(255,255,255,.1);border-radius:999px;scroll-snap-align:center;color:#d9d3ce;font-size:13px;white-space:nowrap}
+  .admin-body .admin-side nav a.active{border-color:#fff;background:#fff;color:#29231f}
+  .admin-body .admin-scroll-cue{position:absolute;z-index:2;right:0;top:50%;display:grid;width:30px;height:42px;place-items:center;border-radius:22px 0 0 22px;background:linear-gradient(90deg,rgba(41,35,31,0),#29231f 38%);color:#fff;font-size:26px;line-height:1;pointer-events:none;transform:translateY(-54%);transition:opacity .2s}
+  .admin-body .admin-scroll-cue.is-hidden{opacity:0}
+  .admin-body .admin-side form{margin:0}
+  .admin-body .admin-side button{width:auto;min-width:58px;min-height:42px;padding:0 10px;border-radius:999px;font-size:12px;white-space:nowrap}
+  .admin-body .admin-main{padding:24px 18px 36px}
+  .admin-body .admin-card{border-radius:12px}
+  .admin-body .table-wrap{position:relative}
+}
+
+@media(max-width:600px){
+  .admin-body .admin-main{padding:20px 14px 32px}
+  .admin-body .admin-main>header{align-items:center;flex-wrap:wrap}
+  .admin-body .admin-main header h1{font-size:27px;line-height:1.25}
+  .admin-body .stats{gap:10px}
+  .admin-body .stats div{min-width:0;padding:17px 15px}
+  .admin-body .stats .visit-stat{overflow:hidden}
+  .admin-body table{min-width:680px}
+  .admin-body th,.admin-body td{padding:13px 14px}
+}

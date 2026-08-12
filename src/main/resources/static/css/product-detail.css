@@ -1,6 +1,7 @@
 .catalog-detail-image {
     display: block;
     width: 100%;
+    max-width: 100%;
     height: auto;
     margin: 32px auto 0;
     object-fit: contain;
