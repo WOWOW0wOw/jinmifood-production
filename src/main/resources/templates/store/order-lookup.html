@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>주문조회 | 진미푸드</title><link rel="stylesheet" href="/css/style.css"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>주문조회 | 진미푸드</title><link rel="stylesheet" href="/css/style.css?v=20260820-1"><th:block th:replace="~{fragments :: storefrontHead}"></th:block></head>
 <body><header th:replace="~{fragments :: header}"></header>
 <main class="section wrap"><div class="page-title"><span class="eyebrow">ORDER LOOKUP</span><h1>비회원 주문조회</h1><p>주문 완료 화면에서 확인한 주문번호와 주문자 연락처를 입력해 주세요.</p></div>
 <form th:action="@{/order-lookup}" method="post" class="lookup-form"><label>주문번호<input name="orderNumber" th:value="${orderNumber}" placeholder="JM으로 시작하는 주문번호" required autocomplete="off"></label><label>연락처<input name="phone" th:value="${phone}" placeholder="010-0000-0000" required inputmode="tel"></label><button class="btn">조회하기</button></form>
