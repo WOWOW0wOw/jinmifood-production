@@ -1,4 +1,4 @@
-# 진미푸드 쇼핑몰
+# 진미푸드 쇼핑몰(ai활용)
 
 Spring Boot 3.5, Thymeleaf, PostgreSQL 기반의 건어물 쇼핑몰과 관리자 페이지입니다.
 
